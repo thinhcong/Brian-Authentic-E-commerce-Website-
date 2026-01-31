@@ -35,12 +35,15 @@ const Header = ({user,cartList,handleLogout}) => {
                             {user.user_metadata?.full_name || "Khách hàng"}
                         </span>
                         </Link>
+                        <Link to ="/">
                         <button 
                             onClick={handleLogout} 
                             className="text-sm bg-black text-white px-3 py-1 rounded hover:bg-gray-800 transition"
                         >
                             Đăng xuất
                         </button>
+                        </Link>
+                        
                     </div>
                 ) : (
                     // TRƯỜNG HỢP 2: CHƯA ĐĂNG NHẬP (Hiện icon User để mở modal)

@@ -1,163 +1,251 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient.js'
+import { FaRecycle } from 'react-icons/fa'
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(false)
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '' })
+  const [newProduct, setNewProduct] = useState({ name: '',
+     price: '',
+      stock: '' ,
+      brand:'',
+    category:'',
+    img:'',
+    description:''
+   })
 
   // ================= FETCH PRODUCTS =================
-  const fetchProducts = async () => {
-    setLoading(true)
-    const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false })
-    if (!error) setProducts(data)
-    setLoading(false)
+useEffect(() => {
+  fetchProducts();
+})
+const fetchProducts = async ()=> {
+  const {data,error} = await supabase
+  .from ('products')
+  .select('*')
+  if (error) {
+    console.log(error);
+    setLoading(true) ;
+
+  } else {
+    setLoading(false) ;
+    setProducts(data);
+
   }
 
-  useEffect(() => {
-    fetchProducts()
-  }, [])
+}
 
-  // ================= UPDATE STOCK =================
-  const updateStock = async (id, stock) => {
-    const { error } = await supabase
-      .from('products')
-      .update({ stock })
-      .eq('id', id)
-
-    if (!error) {
-      alert('Cập nhật stock thành công')
-      fetchProducts()
-    }
-  }
-
-  // ================= DELETE PRODUCT =================
-  const deleteProduct = async (id) => {
-    const confirmDelete = window.confirm('Xóa sản phẩm này?')
-    if (!confirmDelete) return
-
-    const { error } = await supabase.from('products').delete().eq('id', id)
-    if (!error) {
-      alert('Đã xóa sản phẩm')
-      fetchProducts()
-    }
-  }
-
-  // ================= CREATE PRODUCT =================
-  const createProduct = async () => {
-    if (!newProduct.name || !newProduct.price) return alert('Nhập thiếu thông tin')
-
-    const { error } = await supabase.from('products').insert({
+const creatNewProduct = async () => {
+  const {error} = await supabase
+  .from ('products')
+  .insert (
+    {
       name: newProduct.name,
-      price: Number(newProduct.price),
-      stock: Number(newProduct.stock || 0)
-    })
+      price:newProduct.price,
+      sotck:newProduct.stock,
+      category:newProduct.category,
+      brand:newProduct.brand,
+      img:newProduct.img,
+      description:newProduct.description
 
-    if (!error) {
-      alert('Tạo sản phẩm mới thành công')
-      setNewProduct({ name: '', price: '', stock: '' })
-      fetchProducts() 
     }
+    
+    
+  )
+  if (error) {
+    console.log(error);
   }
 
-  return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Admin Products</h1>
+  alert('Thêm thành công')
+  fetchProducts();
+  setNewProduct({ name: '',
+    price: '',
+     stock: '' ,
+     brand:'',  
+     category:'',
+     img:'',
+     description:''})  
+}
 
-      {/* CREATE PRODUCT */}
-      <div className="bg-white p-4 rounded shadow mb-6 space-y-2 max-w-md">
-        <h2 className="font-bold">Thêm sản phẩm mới</h2>
+const updateStock = async (prodcut) => {
+  const {error} = await supabase
+  .from ('products')
+  .update (
+    {
+      stock:prodcut.stock
+    }
+  )
+  .eq('id',prodcut.id)
+  if (error) {
+    console.log(error);
+  }
+  fetchProducts();
+}
+
+
+
+
+   
+  
+
+ return (
+  <div className="p-6 bg-gray-50 min-h-screen">
+    <h1 className="text-3xl font-bold mb-8 text-gray-800">
+      Admin Products
+    </h1>
+
+    {/* CREATE PRODUCT */}
+    <div className="bg-white p-6 rounded-xl shadow-md mb-10 max-w-lg">
+      <h2 className="text-xl font-semibold mb-4 text-gray-700">
+        Thêm sản phẩm mới
+      </h2>
+
+      <div className="space-y-3">
         <input
           placeholder="Tên sản phẩm"
-          className="border p-2 w-full"
+          className="border rounded-lg p-3 w-full focus:ring-2 focus:ring-black outline-none"
           value={newProduct.name}
-          onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+          onChange={(e) =>
+            setNewProduct({ ...newProduct, name: e.target.value })
+          }
         />
+
         <input
           placeholder="Giá"
           type="number"
-          className="border p-2 w-full"
+          className="border rounded-lg p-3 w-full focus:ring-2 focus:ring-black outline-none"
           value={newProduct.price}
-          onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+          onChange={(e) =>
+            setNewProduct({ ...newProduct, price: e.target.value })
+          }
         />
+
         <input
           placeholder="Stock"
           type="number"
-          className="border p-2 w-full"
+          className="border rounded-lg p-3 w-full focus:ring-2 focus:ring-black outline-none"
           value={newProduct.stock}
-          onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
+          onChange={(e) =>
+            setNewProduct({ ...newProduct, stock: e.target.value })
+          }
         />
-        <button onClick={createProduct} className="bg-black text-white px-4 py-2">Tạo</button>
-      </div>
 
-      {/* PRODUCT LIST */}
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <table className="w-full bg-white rounded shadow">
-          <thead className="bg-gray-100 ">
-            <tr>
-              <th className="p-2">Tên</th>
-              <th className="p-2">Giá</th>
-              <th className="p-2">Stock</th>
-              <th className="p-2">Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-              <tr key={p.id} className="border-t">
-                <td className="p-2">{p.name}</td>
-                <td className="p-2">{p.price}</td>
-                <td className="p-2">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() =>
-                        setProducts((prev) =>
-                          prev.map((item) =>
-                            item.id === p.id ? { ...item, stock: item.stock - 1 } : item
-                          )
-                        )
-                      }
-                      className="px-2 bg-gray-200"
-                    >
-                      -
-                    </button>
-                    <span>{p.stock}</span>
-                    <button
-                      onClick={() =>
-                        setProducts((prev) =>
-                          prev.map((item) =>
-                            item.id === p.id ? { ...item, stock: item.stock + 1 } : item
-                          )
-                        )
-                      }
-                      className="px-2 bg-gray-200"
-                    >
-                      +
-                    </button>
-                  </div>
-                </td>
-                <td className="p-2 space-x-2">
-                  <button
-                    onClick={() => updateStock(p.id, p.stock)}
-                    className="bg-blue-600 text-white px-3 py-1"
-                  >
-                    Lưu
-                  </button>
-                  <button
-                    onClick={() => deleteProduct(p.id)}
-                    className="bg-red-600 text-white px-3 py-1"
-                  >
-                    Xóa
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+        <input
+          placeholder="Category"
+          className="border rounded-lg p-3 w-full focus:ring-2 focus:ring-black outline-none"
+          value={newProduct.category}
+          onChange={(e) =>
+            setNewProduct({ ...newProduct, category: e.target.value })
+          }
+        />
+
+        <textarea
+          placeholder="Description"
+          className="border rounded-lg p-3 w-full focus:ring-2 focus:ring-black outline-none"
+          value={newProduct.description}
+          onChange={(e) =>
+            setNewProduct({ ...newProduct, description: e.target.value })
+          }
+        />
+
+        <button
+          onClick={creatNewProduct}
+          className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition"
+        >
+          Tạo sản phẩm
+        </button>
+      </div>
     </div>
-  )
+
+    {/* PRODUCT LIST */}
+    <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <table className="w-full">
+        <thead className="bg-gray-100 text-gray-700">
+          <tr>
+            <th className="p-4 text-left">Tên sản phẩm</th>
+            <th className="p-4 text-left">Giá</th>
+            <th className="p-4 text-left">Stock</th>
+            <th className="p-4 text-center">Hành động</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {products.map((p) => (
+            <tr
+              key={p.id}
+              className="border-t hover:bg-gray-50 transition"
+            >
+              {/* NAME WITH BORDER */}
+              <td className="p-4">
+                <div className="border rounded-lg px-3 py-2 font-medium text-gray-800 bg-gray-50">
+                  {p.name}
+                </div>
+              </td>
+
+              <td className="p-4 text-gray-700">
+                {Number(p.price).toLocaleString()} ₫
+              </td>
+
+              <td className="p-4">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      setProducts((prev) =>
+                        prev.map((item) =>
+                          item.id === p.id
+                            ? { ...item, stock: item.stock - 1 }
+                            : item
+                        )
+                      )
+                    }
+                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                  >
+                    -
+                  </button>
+
+                  <span className="min-w-[40px] text-center font-semibold">
+                    {p.stock}
+                  </span>
+
+                  <button
+                    onClick={() =>
+                      setProducts((prev) =>
+                        prev.map((item) =>
+                          item.id === p.id
+                            ? { ...item, stock: item.stock + 1 }
+                            : item
+                        )
+                      )
+                    }
+                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                  >
+                    +
+                  </button>
+                </div>
+              </td>
+
+              <td className="p-4 text-center space-x-2">
+                <button
+                  onClick={() => updateStock(p)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                >
+                  Lưu
+                </button>
+
+                <button
+                  onClick={() => deleteProduct(p.id)}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                >
+                  Xóa
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)
+
 }
 
 export default AdminProducts

@@ -7,8 +7,8 @@ const ProductCard = ({ product, handleAddToCart, showWishlist }) => {
   const { addWishList, wishList } = useShop();
   const navigate = useNavigate();
 
-  // 1. SỬA LỖI LOGIC: Phải dùng === để tìm xem sản phẩm có trong danh sách không
- const isLiked = wishList?.some((item) => item.id === product.id);
+  
+ const isLiked = wishList?.some((item) => item.product_id === product.id);
 
   const goToDetail = (id) => {
     navigate(`/product/${id}`);

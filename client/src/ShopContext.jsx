@@ -32,21 +32,25 @@ export const ShopProvider = ({ children }) => {
     console.error(error)
     return
   }         
+  console.log(data)
   
-          const normalized = data.map(item => item.products);
-            setWishList(normalized);
+         setWishList(data);
     
        
       }
 
       const checkAdmin = async (userId) => { 
         if(!userId) return ;
+        const { data: { user } } = await supabase.auth.getUser();
        const { data } = await supabase
               .from('profiles')
               .select('*')
               .eq('id', userId)
               .single()
-        setUserInfo(data);     
+        setUserInfo({
+          email: user.email,
+          ...data,
+        });     
         if(data.role === 'admin') {
           setAdmin(true);
     
@@ -97,7 +101,7 @@ useEffect(() => {
       console.error(error);
       return;
     }
-
+    console.log(data)
     setProductList(data); 
   }
 

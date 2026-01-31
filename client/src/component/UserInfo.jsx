@@ -17,7 +17,7 @@ const UserProfile = ({ userInfo }) => {
         fullName: userInfo.full_name || '',
         phone: userInfo.phone || '',
         address: userInfo.address || '',
-        email: userInfo.email || userInfo.username || 'user123',
+        email: userInfo.email || userInfo.username ,
       });
     }
   }, [userInfo]);

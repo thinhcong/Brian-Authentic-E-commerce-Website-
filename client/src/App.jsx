@@ -79,7 +79,9 @@ function App() {
               />
             } />
 
-            
+           
+        </Route>
+         
             <Route path="cart" element={
                <CartPage 
                  cartList={cartList} 
@@ -87,7 +89,6 @@ function App() {
                  handleDelete={handleDelete} 
                />
             } />
-        </Route>
 
 
        

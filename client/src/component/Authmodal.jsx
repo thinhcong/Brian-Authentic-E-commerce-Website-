@@ -9,9 +9,9 @@ const AuthModal = ({ isOpen, onClose }) => {
     const [name, setName] = useState(''); 
     const [isLoading, setIsLoading] = useState(false); 
 
-    if (!isOpen) return null;
+    if (!isOpen) return null;   
 
-    const handleAuth = async () => {
+    const handleAuth = async () => { 
     
         if (!email || !password || (isRegister && !name)) {
             alert("Vui lòng nhập đầy đủ thông tin!");
@@ -34,7 +34,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                 
                 if (error) throw error;
                 alert("Đăng ký thành công! Hãy kiểm tra email để xác thực.");
-                setIsRegister(false); // Chuyển về tab đăng nhập sau khi đăng ký xong
+                setIsRegister(false); 
             } else {
                 // --- ĐĂNG NHẬP ---
                 const { data, error } = await supabase.auth.signInWithPassword({
